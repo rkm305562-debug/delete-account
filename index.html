@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="صفحة حذف حساب تطبيق صوت بنت للمقالب - المطور: فرولة و ككو">
+<title>حذف الحساب - صوت بنت للمقالب</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; font-family:Tahoma,Arial,sans-serif;
+  background:radial-gradient(circle at 50% 0%,rgba(255,64,129,.15),transparent 38%),
+             linear-gradient(145deg,#08070a,#170910 50%,#050405);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  padding:24px 14px;
+}
+.wrap{width:100%;max-width:480px}
+.card{
+  background:rgba(255,255,255,.055); border:1px solid rgba(255,105,180,.22);
+  border-radius:28px; padding:26px; box-shadow:0 24px 70px rgba(0,0,0,.55);
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+}
+.logo{
+  width:64px;height:64px;border-radius:20px;margin:0 auto 15px;
+  display:grid;place-items:center;font-size:30px;
+  background:linear-gradient(135deg,#ff4081,#d81b60);
+  box-shadow:0 12px 30px rgba(255,64,129,.28);
+}
+h1{text-align:center;font-size:24px;margin:0 0 8px;line-height:1.5}
+.sub{text-align:center;color:#fff;font-size:17px;font-weight:700;line-height:1.7;margin:0 0 4px}
+.dev{text-align:center;color:#ffb3d9;font-size:14px;margin:0 0 4px}
+.pkg{text-align:center;color:#c98aae;font-size:12px;margin:0 0 20px;direction:ltr}
+.notice{
+  background:rgba(255,105,180,.08); border:1px solid rgba(255,105,180,.25);
+  color:#ffd1e8;border-radius:16px;padding:13px 14px;font-size:13px;line-height:1.9;margin-bottom:14px
+}
+.data{
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  border-right:3px solid #ff4081;color:#f3c4dd;border-radius:13px;
+  padding:13px 14px;font-size:13px;line-height:1.9;margin-bottom:18px
+}
+label{display:block;font-size:13px;color:#f3c4dd;margin:0 0 7px}
+input{
+  width:100%;border:1px solid rgba(255,105,180,.22);outline:none;
+  background:rgba(0,0,0,.38);color:#fff;border-radius:15px;padding:14px;
+  font-size:16px;margin-bottom:14px;font-family:inherit;
+}
+input:focus{border-color:#ff4081;box-shadow:0 0 0 3px rgba(255,64,129,.18)}
+button{
+  width:100%;border:0;border-radius:15px;padding:15px;font-size:16px;font-weight:700;
+  cursor:pointer;background:linear-gradient(135deg,#ff4081,#e91e63);color:#fff;
+  box-shadow:0 12px 28px rgba(233,30,99,.3);font-family:inherit;
+}
+button:disabled{opacity:.6;cursor:not-allowed}
+#status{display:none;border-radius:15px;padding:13px 14px;margin-top:15px;font-size:14px;line-height:1.8}
+.error{display:block!important;background:rgba(255,70,70,.12);border:1px solid rgba(255,100,100,.3);color:#ffd0d0}
+.small{font-size:12px;color:#dca2c2;text-align:center;line-height:1.8;margin:18px 0 0}
+#done{display:none;text-align:center}
+.check{font-size:52px;margin-bottom:8px;color:#ff4081}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="formCard">
+    <div class="logo">🗑️</div>
+    <h1>حذف حساب تطبيق صوت بنت للمقالب</h1>
+    <p class="sub">📱 تطبيق: صوت بنت للمقالب</p>
+    <p class="dev">👨‍💻 المطور: فرولة و ككو</p>
+    <p class="pkg">com.saot.bant.maklab.tabark</p>
+
+    <div class="notice">
+      حذف الحساب إجراء نهائي. سيتم حذف حساب الدخول والبيانات المرتبطة به من النظام،
+      ولا يمكن التراجع عن العملية بعد نجاحها.
+    </div>
+
+    <div class="data">
+      <strong>البيانات التي تُحذف:</strong> حساب الدخول، اسم المستخدم، الملف الشخصي،
+      المقاطع الصوتية والرسائل المرتبطة بالحساب، ورصيد النقاط.<br>
+      <strong>خطوات الحذف:</strong> أدخل اسم المستخدم وكلمة المرور ثم اضغط «حذف الحساب نهائيًا».<br>
+      <strong>ملاحظة:</strong> استخدام التطبيق لا يتطلب حسابًا؛ يلزم التسجيل فقط لتنزيل الصوت أو استخدام الدردشة.
+    </div>
+
+    <form id="deleteForm">
+      <label for="username">اسم المستخدم</label>
+      <input id="username" type="text" autocomplete="username" required maxlength="50"
+             placeholder="اكتب اسم المستخدم">
+
+      <label for="password">كلمة المرور</label>
+      <input id="password" type="password" autocomplete="current-password" required
+             placeholder="اكتب كلمة المرور">
+
+      <button id="deleteBtn" type="submit">حذف الحساب نهائيًا</button>
+    </form>
+
+    <div id="status"></div>
+
+    <p class="small">
+      إذا كان لديك حساب في تطبيق صوت بنت للمقالب، يمكنك أيضًا حذف الحساب من داخل التطبيق من قسم الإعدادات.
+    </p>
+  </div>
+
+  <div class="card" id="done">
+    <div class="check">✓</div>
+    <h1>تم حذف الحساب</h1>
+    <p class="sub">صوت بنت للمقالب</p>
+    <p class="dev">تم تنفيذ طلب حذف الحساب بنجاح، وتم تسجيل خروجك.</p>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://tofkrflxfndloewwyqcc.supabase.co";
+const SUPABASE_KEY = "sb_publishable_3K_Ru8er1GJ3ndmL1IvhnA_v_S-A9Qb";
+
+const { createClient } = supabase;
+const client = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false }
+});
+
+const form = document.getElementById("deleteForm");
+const btn = document.getElementById("deleteBtn");
+const statusBox = document.getElementById("status");
+const formCard = document.getElementById("formCard");
+const done = document.getElementById("done");
+
+function showStatus(message, type) {
+  statusBox.className = type;
+  statusBox.textContent = message;
+}
+
+function normalizeUsername(value) {
+  let text = value.trim().normalize("NFKC").toLowerCase();
+  let out = "";
+  for (const ch of text) {
+    switch (ch) {
+      case "\u06CC": case "\u0649": out += "\u064A"; break;
+      case "\u06A9": case "\u06AF": out += "\u0643"; break;
+      case "\u0654": case "\u0655": out += " "; break;
+      case "\u0660": case "\u06F0": out += "0"; break;
+      case "\u0661": case "\u06F1": out += "1"; break;
+      case "\u0662": case "\u06F2": out += "2"; break;
+      case "\u0663": case "\u06F3": out += "3"; break;
+      case "\u0664": case "\u06F4": out += "4"; break;
+      case "\u0665": case "\u06F5": out += "5"; break;
+      case "\u0666": case "\u06F6": out += "6"; break;
+      case "\u0667": case "\u06F7": out += "7"; break;
+      case "\u0668": case "\u06F8": out += "8"; break;
+      case "\u0669": case "\u06F9": out += "9"; break;
+      default: out += ch;
+    }
+  }
+  return out
+    .replace(/[\u200B\u200C\u200D\u200E\u200F\u061C\uFEFF]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function usernameToInternalEmail(username) {
+  const normalized = normalizeUsername(username);
+  const bytes = new TextEncoder().encode(normalized);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+  const hex = Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 24);
+  return "u" + hex + "@zainqhchat.com";
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  statusBox.className = "";
+  statusBox.textContent = "";
+
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  if (!username.trim() || !password) {
+    showStatus("يرجى إدخال اسم المستخدم وكلمة المرور.", "error");
+    return;
+  }
+
+  const confirmed = confirm(
+    "هل أنت متأكد من حذف الحساب نهائيًا؟\n\n" +
+    "سيتم حذف الحساب والبيانات المرتبطة به ولا يمكن التراجع عن العملية."
+  );
+  if (!confirmed) return;
+
+  btn.disabled = true;
+  btn.textContent = "جارٍ التحقق والحذف...";
+
+  try {
+    const email = await usernameToInternalEmail(username);
+
+    const { data: loginData, error: loginError } =
+      await client.auth.signInWithPassword({ email, password });
+
+    if (loginError || !loginData?.session) {
+      throw new Error("اسم المستخدم أو كلمة المرور غير صحيحة.");
+    }
+
+    const { error: deleteError } = await client.rpc("delete_own_account");
+
+    if (deleteError) {
+      console.error(deleteError);
+      throw new Error("تعذر حذف الحساب حاليًا. تأكد من أن ميزة حذف الحساب مفعّلة على الخادم.");
+    }
+
+    await client.auth.signOut();
+
+    formCard.style.display = "none";
+    done.style.display = "block";
+  } catch (error) {
+    console.error(error);
+    showStatus(error?.message || "حدث خطأ غير متوقع. حاول مرة أخرى.", "error");
+    btn.disabled = false;
+    btn.textContent = "حذف الحساب نهائيًا";
+  }
+});
+</script>
+</body>
+</html>
